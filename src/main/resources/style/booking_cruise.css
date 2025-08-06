@@ -65,7 +65,7 @@
     -fx-text-fill: white;
 }
 #confirmBtn:hover   { -fx-background-color: #1374E6; }
-#confirmBtn { -fx-background-color: #0E5CBF; }
+
 
 /* ---- Secondario: Annulla  ------------------- */
 #cancelBtn {
@@ -76,9 +76,7 @@
 #cancelBtn:hover {
     -fx-background-color: rgba(255,255,255,0.10);
 }
-#cancelBtn{
-    -fx-background-color: rgba(255,255,255,0.20);
-}
+
 
 /* =======================================================
    5.  Messaggi di errore
