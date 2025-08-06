@@ -30,7 +30,7 @@ public class HomePageView {
 
         /* Messaggio descrittivo */
         String msg = isUser
-                ? "Effettuate la vostra prenotazione e godetevi i nostri gatti."
+                ? "Benvenuti nel luogo dove prenotare la tua vacanza da sogno"
                 : "Benvenuto nel pannello di controllo per lo staf.";
         Label description = new Label(msg);
 
