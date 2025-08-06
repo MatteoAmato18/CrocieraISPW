@@ -1,6 +1,8 @@
 package dao;
 
 import entity.Destination;
+import exception.DataAccessException;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +78,7 @@ public class DestinationDaoDB implements GenericDao<Destination> {
             while (rs.next())
                 list.add(new Destination(rs.getString("name"), rs.getDouble("cost")));
         } catch (SQLException e) {
-            throw new RuntimeException("Unable to retrieve destinations.", e);
+            throw new DataAccessException("Unable to retrieve destinations.", e);
         }
         return list;
     }

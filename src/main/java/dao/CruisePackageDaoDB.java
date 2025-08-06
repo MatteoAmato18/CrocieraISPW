@@ -2,6 +2,8 @@ package dao;
 
 
 import entity.CruisePackage;
+import exception.DataAccessException;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +84,7 @@ public class CruisePackageDaoDB implements GenericDao<CruisePackage> {
                    ));
                }
            } catch (SQLException e) {
-            throw new RuntimeException("Unable to retrieve cruise packages.", e);
+            throw new DataAccessException("Unable to retrieve cruise packages.", e);
         }
         return list;
     }
