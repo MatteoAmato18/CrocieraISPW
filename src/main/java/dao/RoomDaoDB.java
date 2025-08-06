@@ -19,32 +19,43 @@ public class RoomDaoDB implements GenericDao<Room> {
     private static final String COL_MAX_GUEST = "max_guests";
     private static final String COL_STATUS    = "status";
 
-    /* =====================  Frammenti SQL  ========================= */
-    private static final String SEP          = ", ";
-    private static final String EQ_QM        = " = ?";
-    private static final String KW_WHERE     = " WHERE ";
-    private static final String KW_SET       = " SET ";
+    /* =====================  SQL (letterali)  ======================== */
+    private static final String COLS =
+            COL_TYPE + "," + COL_COST + "," + COL_DESC + "," + COL_MAX_GUEST + "," + COL_STATUS;
 
-    /** SELECT con colonne esplicite (evita `SELECT *`). */
-    private static final String COLS = String.join(SEP,
-            COL_TYPE, COL_COST, COL_DESC, COL_MAX_GUEST, COL_STATUS);
-    private static final String BASE_SELECT = "SELECT " + COLS + " FROM " + TBL;
+    private static final String SQL_INSERT =
+            "INSERT INTO " + TBL + " (" + COLS + ") VALUES (?,?,?,?,?)";
+
+    private static final String SQL_SELECT_ALL =
+            "SELECT " + COLS + " FROM " + TBL;
+
+    private static final String SQL_SELECT_BY_TYPE =
+            "SELECT " + COLS + " FROM " + TBL + " WHERE " + COL_TYPE + " = ?";
+
+    private static final String SQL_SELECT_FREE =
+            "SELECT " + COLS + " FROM " + TBL + " WHERE " + COL_STATUS + " = ?";
+
+    private static final String SQL_UPDATE =
+            "UPDATE " + TBL + " SET "
+                    + COL_COST + " = ?, "
+                    + COL_DESC + " = ?, "
+                    + COL_MAX_GUEST + " = ?, "
+                    + COL_STATUS + " = ? "
+                    + "WHERE " + COL_TYPE + " = ?";
+
+    private static final String SQL_DELETE =
+            "DELETE FROM " + TBL + " WHERE " + COL_TYPE + " = ?";
 
     /* =============================================================== */
 
     private final Connection connection;
 
-    public RoomDaoDB(Connection connection) {
-        this.connection = connection;
-    }
+    public RoomDaoDB(Connection connection) { this.connection = connection; }
 
     /* ============================= CREATE ========================== */
     @Override
     public void create(Room r) throws SQLException {
-        final String sql = "INSERT INTO " + TBL + " (" + String.join(SEP,
-                COL_TYPE, COL_COST, COL_DESC, COL_MAX_GUEST, COL_STATUS) + ") VALUES (?,?,?,?,?)";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(SQL_INSERT)) {
             ps.setString(1, r.getType());
             ps.setDouble(2, r.getCost());
             ps.setString(3, r.getDescription());
@@ -60,9 +71,7 @@ public class RoomDaoDB implements GenericDao<Room> {
         if (keys.length != 1 || !(keys[0] instanceof String))
             throw new InvalidDaoKeyException("Room.read expects a single String (type)");
 
-        final String sql = BASE_SELECT + KW_WHERE + COL_TYPE + EQ_QM;
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(SQL_SELECT_BY_TYPE)) {
             ps.setString(1, (String) keys[0]);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? map(rs) : null;
@@ -73,16 +82,7 @@ public class RoomDaoDB implements GenericDao<Room> {
     /* ============================= UPDATE ========================== */
     @Override
     public void update(Room r) throws SQLException {
-        final String setClause = String.join(SEP,
-                COL_COST + EQ_QM,
-                COL_DESC + EQ_QM,
-                COL_MAX_GUEST + EQ_QM,
-                COL_STATUS + EQ_QM);
-
-        final String sql = "UPDATE " + TBL + KW_SET + setClause
-                         + KW_WHERE + COL_TYPE + EQ_QM;
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(SQL_UPDATE)) {
             ps.setDouble(1, r.getCost());
             ps.setString(2, r.getDescription());
             ps.setInt   (3, r.getMaxGuests());
@@ -98,43 +98,39 @@ public class RoomDaoDB implements GenericDao<Room> {
         if (keys.length != 1 || !(keys[0] instanceof String))
             throw new InvalidDaoKeyException("Room.delete expects a single String (type)");
 
-        final String sql = "DELETE FROM " + TBL + KW_WHERE + COL_TYPE + EQ_QM;
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(SQL_DELETE)) {
             ps.setString(1, (String) keys[0]);
             ps.executeUpdate();
         }
     }
 
     /* ========================= QUERY DI SERVIZIO =================== */
-    /** Solo stanze con status FREE. */
     public List<Room> readFreeRooms() {
-        final String sql = BASE_SELECT + KW_WHERE + COL_STATUS + EQ_QM;
-        return queryToList(sql, ps -> ps.setString(1, RoomStatus.FREE.name()));
+        List<Room> list = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(SQL_SELECT_FREE)) {
+            ps.setString(1, RoomStatus.FREE.name());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Impossibile recuperare le stanze libere", e);
+        }
+        return list;
     }
 
     @Override
     public List<Room> readAll() {
-        return queryToList(BASE_SELECT, null);
-    }
-
-    /** Funzionale semplice per il binding dei parametri. */
-    @FunctionalInterface
-    private interface Binder { void bind(PreparedStatement ps) throws SQLException; }
-
-    private List<Room> queryToList(String sql, Binder binder) {
         List<Room> list = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            if (binder != null) binder.bind(ps);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(map(rs));
-            }
+        try (PreparedStatement ps = connection.prepareStatement(SQL_SELECT_ALL);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(map(rs));
         } catch (SQLException e) {
             throw new DataAccessException("Impossibile recuperare l'elenco stanze", e);
         }
         return list;
     }
 
+    /* ============================= Mapper ========================== */
     private Room map(ResultSet rs) throws SQLException {
         return new Room(
                 rs.getString (COL_TYPE),
