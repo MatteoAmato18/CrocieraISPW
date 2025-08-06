@@ -1,0 +1,67 @@
+/* Sfondo bianco */
+.root {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 20;
+    -fx-alignment: center;
+}
+
+/* Stile dei titoli */
+.label {
+    -fx-text-fill: #000000;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* Stile dei bottoni */
+.button {
+    -fx-background-color: #333333;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5px;
+    -fx-padding: 10px 15px;
+}
+
+.button:hover {
+    -fx-background-color: #555555;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Stile dei campi di testo */
+.text-field, .password-field {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+    -fx-border-color: #CCCCCC;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+    -fx-font-size: 14px;
+    -fx-pref-width: 250; /* Larghezza preferita */
+    -fx-max-width: 300; /* Larghezza massima */
+}
+
+.text-field:focus,
+.password-field:focus {
+    -fx-border-color: #333333;
+    -fx-border-width: 2;
+}
+
+/* Stile per il messaggio di errore */
+.text {
+    -fx-fill: #000000; /* Rosso per indicare errore */
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+}
+
+.login-prompt {
+    -fx-font-size: 14px;
+    -fx-text-alignment: center;
+    -fx-padding: 10px 0;
+    -fx-text-fill: #333;
+}
+
+.error-message {
+    -fx-fill: black;
+    -fx-font-size: 14px;
+    -fx-padding: 5;
+}
