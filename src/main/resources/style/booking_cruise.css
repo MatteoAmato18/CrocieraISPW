@@ -1,14 +1,19 @@
-/* ========================= Sfondo ========================= */
+/* =======================================================
+   1.  Sfondo gradiente blu oceano + centratura
+   ======================================================= */
 .root {
+    /* gradiente verticale */
     -fx-background-color:
         linear-gradient(to bottom, #3DB8FF 0%, #0B60A3 45%, #044F84 100%);
+    /* centro tutto nello StackPane (backup) */
     -fx-alignment: CENTER;
     -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
-/* ========================= Card / form ==================== */
-/* Usa .container per allinearlo alla view Java */
-.container {
+/* =======================================================
+   2.  Card / form bianco
+   ======================================================= */
+.card {
     -fx-background-color: rgba(255,255,255,0.94);
     -fx-background-radius: 8;
     -fx-padding: 32;
@@ -17,13 +22,16 @@
     -fx-max-width: 380;
 }
 
-.container .label {
+/* Titoli (label descrittive) */
+.card .label {
     -fx-text-fill: #044F84;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
 }
 
-/* ========================= Campi input ==================== */
+/* =======================================================
+   3.  Campi di testo compatti
+   ======================================================= */
 .text-field,
 .password-field {
     -fx-background-color: white;
@@ -36,13 +44,14 @@
     -fx-max-width: 260;
 }
 
-.text-field:focused,
-.password-field:focused {
+.password-field {
     -fx-border-color: #044F84;
     -fx-border-width: 2;
 }
 
-/* ========================= Bottoni ======================== */
+/* =======================================================
+   5.  BOTTONI – versione leggibile su blu scuro
+   ======================================================= */
 .button {
     -fx-background-radius: 10;
     -fx-padding: 8 24;
@@ -50,26 +59,31 @@
     -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.25), 3, 0, 0, 1);
 }
 
-/* Primario: Conferma */
+/* ---- Primario: Conferma (blu più chiaro) ---- */
 #confirmBtn {
-    -fx-background-color: #1F8CFF;
+    -fx-background-color: #1F8CFF;   /* blu cielo intenso */
     -fx-text-fill: white;
 }
-#confirmBtn:hover { -fx-background-color: #1374E6; }
-#confirmBtn:armed { -fx-background-color: #0E5CBF; }   /* <-- era :pressed */
+#confirmBtn:hover   { -fx-background-color: #1374E6; }
+#confirmBtn { -fx-background-color: #0E5CBF; }
 
-/* Secondario: Annulla */
+/* ---- Secondario: Annulla  ------------------- */
 #cancelBtn {
     -fx-background-color: transparent;
     -fx-border-color: white;
     -fx-text-fill: white;
 }
-#cancelBtn:hover { -fx-background-color: rgba(255,255,255,0.10); }
-#cancelBtn:armed { -fx-background-color: rgba(255,255,255,0.20); } /* <-- era :pressed */
+#cancelBtn:hover {
+    -fx-background-color: rgba(255,255,255,0.10);
+}
+#cancelBtn{
+    -fx-background-color: rgba(255,255,255,0.20);
+}
 
-/* ========================= Errori ========================= */
+/* =======================================================
+   5.  Messaggi di errore
+   ======================================================= */
 .error-message {
     -fx-text-fill: #E74C3C;
     -fx-font-size: 12;
 }
-
